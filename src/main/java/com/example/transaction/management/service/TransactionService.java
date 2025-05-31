@@ -1,7 +1,6 @@
 package com.example.transaction.management.service;
 
 import com.example.transaction.management.model.Transaction;
-import com.example.transaction.management.model.TransactionType;
 import com.example.transaction.management.repository.TransactionRepository;
 import com.example.transaction.management.exception.TransactionException;
 import com.example.transaction.management.exception.TransactionErrorType;
@@ -14,12 +13,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Validated
 public class TransactionService {
     private static final int MAX_PAGE_SIZE = 50;
     private final TransactionRepository repository;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public TransactionService(TransactionRepository repository) {
         this.repository = repository;
@@ -41,21 +42,31 @@ public class TransactionService {
     }
 
     @CacheEvict(value = "transactions", key = "#id")
-    public Transaction updateTransaction(UUID id, Transaction transaction) {
+    public synchronized Transaction updateTransaction(UUID id, Transaction transaction) {
         validateTransaction(transaction);
-        if (!repository.findById(id).isPresent()) {
-            throw new TransactionException(TransactionErrorType.TRANSACTION_NOT_FOUND);
+        try {
+            lock.lock();
+            if (!repository.findById(id).isPresent()) {
+                throw new TransactionException(TransactionErrorType.TRANSACTION_NOT_FOUND);
+            }
+            transaction.setId(id);
+            return repository.save(transaction);
+        } finally {
+            lock.unlock();
         }
-        transaction.setId(id);
-        return repository.save(transaction);
     }
 
     @CacheEvict(value = "transactions", key = "#id")
-    public void deleteTransaction(UUID id) {
-        if (!repository.findById(id).isPresent()) {
-            throw new TransactionException(TransactionErrorType.TRANSACTION_NOT_FOUND);
+    public synchronized void deleteTransaction(UUID id) {
+        try {
+            lock.lock();
+            if (!repository.findById(id).isPresent()) {
+                throw new TransactionException(TransactionErrorType.TRANSACTION_NOT_FOUND);
+            }
+            repository.deleteById(id);
+        } finally {
+            lock.unlock();
         }
-        repository.deleteById(id);
     }
 
     private void validateTransaction(Transaction transaction) {
@@ -90,4 +101,4 @@ public class TransactionService {
             throw new TransactionException(TransactionErrorType.INVALID_PAGINATION);
         }
     }
-} 
+}
