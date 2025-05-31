@@ -6,7 +6,9 @@ public enum TransactionErrorType {
     MISSING_DESCRIPTION("Transaction description is required"),
     MISSING_CATEGORY("Transaction category is required"),
     NEGATIVE_AMOUNT("Transaction amount cannot be negative"),
-    ZERO_AMOUNT("Transaction amount cannot be zero");
+    ZERO_AMOUNT("Transaction amount cannot be zero"),
+    TRANSACTION_NOT_FOUND("Transaction not found"),
+    INVALID_PAGINATION("Invalid pagination parameters");
 
     private final String message;
 

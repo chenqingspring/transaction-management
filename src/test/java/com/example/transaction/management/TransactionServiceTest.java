@@ -5,8 +5,14 @@ import com.example.transaction.management.model.TransactionType;
 import com.example.transaction.management.repository.InMemoryTransactionRepository;
 import com.example.transaction.management.repository.TransactionRepository;
 import com.example.transaction.management.service.TransactionService;
+import com.example.transaction.management.exception.TransactionException;
+import com.example.transaction.management.exception.TransactionErrorType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TransactionServiceTest {
     private TransactionService service;
     private TransactionRepository repository;
+    
+    // Maximum page size for pagination tests
+    private static final int MAX_PAGE_SIZE = 50;
+    
+    // Invalid page size for pagination tests
+    private static final int INVALID_PAGE_SIZE = MAX_PAGE_SIZE + 1;
 
     @BeforeEach
     void setUp() {
@@ -24,6 +36,7 @@ public class TransactionServiceTest {
     }
 
     @Test
+    @DisplayName("Should create a new transaction with valid data")
     void testCreateTransaction() {
         Transaction transaction = new Transaction();
         transaction.setAmount(new BigDecimal("100.00"));
@@ -37,6 +50,7 @@ public class TransactionServiceTest {
     }
 
     @Test
+    @DisplayName("Should retrieve a transaction by its ID")
     void testGetTransaction() {
         Transaction transaction = new Transaction();
         transaction.setAmount(new BigDecimal("100.00"));
@@ -51,6 +65,7 @@ public class TransactionServiceTest {
     }
 
     @Test
+    @DisplayName("Should retrieve all transactions with pagination")
     void testGetAllTransactions() {
         Transaction transaction1 = new Transaction();
         transaction1.setAmount(new BigDecimal("100.00"));
@@ -72,6 +87,7 @@ public class TransactionServiceTest {
     }
 
     @Test
+    @DisplayName("Should update an existing transaction")
     void testUpdateTransaction() {
         Transaction transaction = new Transaction();
         transaction.setAmount(new BigDecimal("100.00"));
@@ -86,6 +102,7 @@ public class TransactionServiceTest {
     }
 
     @Test
+    @DisplayName("Should delete a transaction by its ID")
     void testDeleteTransaction() {
         Transaction transaction = new Transaction();
         transaction.setAmount(new BigDecimal("100.00"));
@@ -97,5 +114,30 @@ public class TransactionServiceTest {
         service.deleteTransaction(saved.getId());
         Optional<Transaction> retrieved = service.getTransaction(saved.getId());
         assertFalse(retrieved.isPresent());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when page size is invalid")
+    void testInvalidPageSize() {
+        // Test with page size exceeding maximum
+        TransactionException exception = assertThrows(
+            TransactionException.class,
+            () -> service.getAllTransactions(0, INVALID_PAGE_SIZE)
+        );
+        assertEquals(TransactionErrorType.INVALID_PAGINATION, exception.getErrorType());
+
+        // Test with negative page size
+        exception = assertThrows(
+            TransactionException.class,
+            () -> service.getAllTransactions(0, -1)
+        );
+        assertEquals(TransactionErrorType.INVALID_PAGINATION, exception.getErrorType());
+
+        // Test with zero page size
+        exception = assertThrows(
+            TransactionException.class,
+            () -> service.getAllTransactions(0, 0)
+        );
+        assertEquals(TransactionErrorType.INVALID_PAGINATION, exception.getErrorType());
     }
 } 
