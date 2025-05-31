@@ -98,3 +98,35 @@
 - **URL**: `DELETE /transactions/{id}`
 - **Response**: 200 OK
 - **Error**: 404 Not Found (if transaction not found) 
+
+## Error Handling
+
+All API endpoints may return errors in the following JSON format:
+
+```
+{
+  "timestamp": "2024-06-09T12:34:56.789",
+  "status": 400,
+  "error": "Transaction Error",
+  "message": "Transaction not found"
+}
+```
+
+- `status` will be 400 for transaction-related errors, 500 for internal server errors.
+- `error` describes the type of error.
+- `message` provides details about the error.
+- `timestamp` is the time the error occurred.
+
+### Example Error Responses
+
+- **Transaction Not Found**
+  - Status: 400
+  - Message: `Transaction not found`
+
+- **Internal Server Error**
+  - Status: 500
+  - Message: `Detailed error message`
+
+### Exception Handling
+
+The application uses a global exception handler to catch and return errors in a consistent, RESTful format. Transaction-related errors throw a `TransactionException` and are handled with a 400 status code. All other exceptions return a 500 status code. 

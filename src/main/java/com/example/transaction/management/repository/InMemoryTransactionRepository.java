@@ -1,12 +1,14 @@
 package com.example.transaction.management.repository;
 
 import com.example.transaction.management.model.Transaction;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Repository
 public class InMemoryTransactionRepository implements TransactionRepository {
     private final ConcurrentHashMap<UUID, Transaction> transactions = new ConcurrentHashMap<>();
 
@@ -33,4 +35,4 @@ public class InMemoryTransactionRepository implements TransactionRepository {
     public void deleteById(UUID id) {
         transactions.remove(id);
     }
-} 
+}
