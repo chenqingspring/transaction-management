@@ -8,27 +8,20 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class TransactionService {
     private final TransactionRepository repository;
-    private final ReentrantLock lock = new ReentrantLock();
 
     public TransactionService(TransactionRepository repository) {
         this.repository = repository;
     }
 
     public Transaction createTransaction(Transaction transaction) {
-        lock.lock();
-        try {
-            if (transaction.getId() == null) {
-                transaction.setId(UUID.randomUUID());
-            }
-            return repository.save(transaction);
-        } finally {
-            lock.unlock();
+        if (transaction.getId() == null) {
+            transaction.setId(UUID.randomUUID());
         }
+        return repository.save(transaction);
     }
 
     @Cacheable(value = "transactions", key = "#id")
@@ -43,25 +36,15 @@ public class TransactionService {
 
     @CacheEvict(value = "transactions", allEntries = true)
     public Transaction updateTransaction(UUID id, Transaction transaction) {
-        lock.lock();
-        try {
-            if (repository.findById(id).isPresent()) {
-                transaction.setId(id);
-                return repository.save(transaction);
-            }
-            throw new RuntimeException("Transaction not found");
-        } finally {
-            lock.unlock();
+        if (repository.findById(id).isPresent()) {
+            transaction.setId(id);
+            return repository.save(transaction);
         }
+        throw new RuntimeException("Transaction not found");
     }
 
     @CacheEvict(value = "transactions", allEntries = true)
     public void deleteTransaction(UUID id) {
-        lock.lock();
-        try {
-            repository.deleteById(id);
-        } finally {
-            lock.unlock();
-        }
+        repository.deleteById(id);
     }
 } 
