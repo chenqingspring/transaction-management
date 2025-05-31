@@ -169,6 +169,9 @@ The API documentation is available at `/swagger-ui/index.html`.
   - CPU utilization was efficient
   - No deadlocks or thread starvation
 
+  screenshots:
+  ![stress-test](screenshots/tests.png)
+
 ## Error Handling
 
 ### Error Types
