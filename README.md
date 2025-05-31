@@ -29,6 +29,7 @@ A Spring Boot application for managing financial transactions.
 - Spring Boot Starter Cache
 - Lombok
 - JUnit 5
+- Swagger UI
 
 ## Features
 
@@ -68,6 +69,8 @@ docker build -t transaction-management:latest .
    kubectl get pods
    kubectl get services
    ```
+   screenshots:
+   ![kubectl get pods & services](screenshots/kubernetes.png)
 
 3. Access the application:
    - Local: http://localhost:8081
@@ -94,6 +97,10 @@ docker build -t transaction-management:latest .
 - Metrics endpoint: `/actuator/metrics`
 
 ## API Documentation
+
+The API documentation is available at `/swagger-ui/index.html`.
+
+![swagger-ui](screenshots/swagger-ui.png)
 
 ### Create Transaction
 - **Endpoint:** `POST /transactions`
