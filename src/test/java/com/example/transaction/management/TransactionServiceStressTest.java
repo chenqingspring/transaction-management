@@ -5,8 +5,6 @@ import com.example.transaction.management.model.TransactionType;
 import com.example.transaction.management.repository.InMemoryTransactionRepository;
 import com.example.transaction.management.repository.TransactionRepository;
 import com.example.transaction.management.service.TransactionService;
-import com.example.transaction.management.exception.TransactionException;
-import com.example.transaction.management.exception.TransactionErrorType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;

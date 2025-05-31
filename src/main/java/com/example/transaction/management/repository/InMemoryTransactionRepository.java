@@ -28,8 +28,9 @@ public class InMemoryTransactionRepository implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> findAll(int page, int size) {
-        return transactions.values().stream()
+    public List<Transaction> findAll(int page, int size) {        
+        List<Transaction> snapshot = new ArrayList<>(transactions.values());
+        return snapshot.stream()
                 .sorted(Comparator.comparing(Transaction::getTimestamp).reversed())
                 .skip((long) page * size)
                 .limit(size)

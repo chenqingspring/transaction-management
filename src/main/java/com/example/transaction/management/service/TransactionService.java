@@ -42,7 +42,7 @@ public class TransactionService {
     }
 
     @CacheEvict(value = "transactions", key = "#id")
-    public synchronized Transaction updateTransaction(UUID id, Transaction transaction) {
+    public Transaction updateTransaction(UUID id, Transaction transaction) {
         validateTransaction(transaction);
         try {
             lock.lock();
@@ -57,7 +57,7 @@ public class TransactionService {
     }
 
     @CacheEvict(value = "transactions", key = "#id")
-    public synchronized void deleteTransaction(UUID id) {
+    public void deleteTransaction(UUID id) {
         try {
             lock.lock();
             if (!repository.findById(id).isPresent()) {
